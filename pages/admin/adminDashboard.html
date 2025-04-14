@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/assets/css/adminDashboad.css">
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Admin Dashboard</h2>
+            <ul>
+                <li><a href="./adminDashboard.html">Quản lý lịch</a></li>
+                <li><a href="./serviceManagement.html">Quản lý dịch vụ</a></li>
+                <li><a href="/pages/user/dashboard.html">Trang chủ</a></li>
+                <li><a href="/pages/auth/login.html" style="color: red;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="content">
+            <h1>Thống kê lịch tập</h1>
+            <div class="stats">
+                <div class="stat-box">
+                    <h4>Tổng số lịch Gym</h4>
+                    <span style="color:#3b82f6;">0</span>
+                </div>
+                <div class="stat-box">
+                    <h4>Tổng số lịch Yoga</h4>
+                    <span style="color:green;">0</span>
+                </div>
+                <div class="stat-box">
+                    <h4>Tổng số lịch Zumba</h4>
+                    <span style="color:purple;">0</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div style="color: #d0d0d0; font-weight: bold; font-size: 13px;">
+                  <div style="width: 100px; height: 10px;border: 1px solid#3b82f6; background-color: #73a9ff; display: inline-block; margin-right: 10px;"></div>
+                  Số lượng lịch đặt
+                </div>
+        
+                <div class="bar-chart">
+                  <div class="bar">
+                    <div class="bar-fill" data-height="0"></div>
+                    <div class="bar-label">Gym</div>
+                  </div>
+                  <div class="bar">
+                    <div class="bar-fill" data-height="80"></div>
+                    <div class="bar-label">Yoga</div>
+                  </div>
+                  <div class="bar">
+                    <div class="bar-fill" data-height="0"></div>
+                    <div class="bar-label">Zumba</div>
+                  </div>
+                </div>
+              </div>
+
+                <div class="filter-section">
+                    <label for="class">Lớp học:</label>
+                    <select id="class">
+                        <option>Tất cả</option>
+                    </select>
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" placeholder="Tìm theo email">
+                    <label for="date">Ngày:</label>
+                    <input type="date" id="date">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lớp học</th>
+                            <th>Ngày tập</th>
+                            <th>Khung giờ</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                </table>
+        </main>
+    </div>
+
+    <div id="editModal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px;">
+            <h3>Sửa lịch</h3>
+            <select id="editClass">
+                <option>Gym</option>
+                <option>Yoga</option>
+                <option>Zumba</option>
+            </select><br><br>
+            <input type="date" id="editDate"><br><br>
+            <input type="time" id="editTime"><br><br>
+            <input type="text" id="editName" placeholder="Họ tên"><br><br>
+            <input type="email" id="editEmail" placeholder="Email"><br><br>
+            <button id="saveEditBtn">Lưu</button>
+            <button id="cancelEditBtn">Hủy</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <p>Bạn có chắc muốn xóa lịch này không?</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn">Đồng ý</button>
+                <button id="cancelDeleteBtn">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/adminDashboad.js"></script>
+</body>
+
+</html>

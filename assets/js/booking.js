@@ -107,37 +107,70 @@ window.addEventListener("DOMContentLoaded", function () {
         const className = classSelect.value;
         const date = dateInput.value;
         const time = timeSelect.value;
-        const fullname = fullnameInput.value.trim();
+        let fullname = fullnameInput.value.trim();
         const email = emailInput.value.trim();
-
+    
         if (!className || !date || !time || !fullname || !email) {
             errorModalMessage.textContent = "Vui lòng điền đầy đủ thông tin!";
             errorModal.show();
             return;
         }
-
-        // if (fullname.toLowerCase().includes("tùng")) {
-        //     errorModalMessage.textContent = "Xin lỗi, người dùng tên 'Tùng' đang bị cấm đặt lịch!";
-        //     errorModal.show();
-        //     fullnameInput.classList.add("input-error");
-        //     return;
-        // } else {
-        //     fullnameInput.classList.remove("input-error");
-        // }
-
+    
+        const validChars = [
+            "a","ă","â","b","c","d","đ","e","ê","g","h","i","k","l","m","n",
+            "o","ô","ơ","p","q","r","s","t","u","ư","v","x","y",
+            "A","Ă","Â","B","C","D","Đ","E","Ê","G","H","I","K","L","M","N",
+            "O","Ô","Ơ","P","Q","R","S","T","U","Ư","V","X","Y",
+            "á","à","ả","ã","ạ","ắ","ằ","ẳ","ẵ","ặ","ấ","ầ","ẩ","ẫ","ậ",
+            "é","è","ẻ","ẽ","ẹ","ế","ề","ể","ễ","ệ",
+            "í","ì","ỉ","ĩ","ị",
+            "ó","ò","ỏ","õ","ọ","ố","ồ","ổ","ỗ","ộ","ớ","ờ","ở","ỡ","ợ",
+            "ú","ù","ủ","ũ","ụ","ứ","ừ","ử","ữ","ự",
+            "ý","ỳ","ỷ","ỹ","ỵ",
+            "Á","À","Ả","Ã","Ạ","Ắ","Ằ","Ẳ","Ẵ","Ặ","Ấ","Ầ","Ẩ","Ẫ","Ậ",
+            "É","È","Ẻ","Ẽ","Ẹ","Ế","Ề","Ể","Ễ","Ệ",
+            "Í","Ì","Ỉ","Ĩ","Ị",
+            "Ó","Ò","Ỏ","Õ","Ọ","Ố","Ồ","Ổ","Ỗ","Ộ","Ớ","Ờ","Ở","Ỡ","Ợ",
+            "Ú","Ù","Ủ","Ũ","Ụ","Ứ","Ừ","Ử","Ữ","Ự",
+            "Ý","Ỳ","Ỷ","Ỹ","Ỵ",
+            " "
+        ];
+    
+        for (let i = 0; i < fullname.length; i++) {
+            let char = fullname[i];
+            let found = false;
+            for (let j = 0; j < validChars.length; j++) {
+                if (char === validChars[j]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                errorModalMessage.textContent = "Tên không được chứa số hoặc ký tự đặc biệt! Vui lòng nhập lại họ và tên!";
+                errorModal.show();
+                return;
+            }
+        }
+    
+        fullname = fullname
+            .split(" ")
+            .filter(word => word)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
+    
         const newSchedule = { className, date, time, fullname, email };
-
+    
         if (editingIndex !== null) {
             scheduleList[editingIndex] = newSchedule;
         } else {
             scheduleList.push(newSchedule);
         }
-
+    
         localStorage.setItem("schedules", JSON.stringify(scheduleList));
         renderScheduleTable(currentPage);
         closeModal();
     });
-
+    
     closeModalBtn.addEventListener("click", closeModal);
 
     addScheduleButton.addEventListener("click", function () {

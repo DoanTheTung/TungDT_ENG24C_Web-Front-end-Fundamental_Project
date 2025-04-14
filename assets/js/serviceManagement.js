@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const serviceTableBody = document.createElement("tbody");
     serviceTable.appendChild(serviceTableBody);
 
+    const paginationContainer = document.createElement("div");
+    paginationContainer.className = "pagination";
+    serviceTable.parentElement.appendChild(paginationContainer);
+
+    let services = [];
+    let currentPage = 1;
+    const itemsPerPage = 5;
+
     const modalOverlay = document.createElement("div");
     modalOverlay.className = "modal-overlay";
     modalOverlay.innerHTML = `
@@ -14,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <input type="text" id="imageUrl" placeholder="URL hình ảnh (tùy chọn)">
             <p id="modalError" class="modal-error"></p>
             <div class="modal-buttons">
-                <button id="saveModal"> Lưu </button>
-                <button id="cancelModal"> Hủy </button>
+                <button id="saveModal">Lưu</button>
+                <button id="cancelModal">Hủy</button>
             </div>
         </div>
     `;
@@ -70,6 +78,85 @@ document.addEventListener("DOMContentLoaded", () => {
         rowToDelete = null;
     }
 
+    function renderPagination() {
+        paginationContainer.innerHTML = "";
+
+        const totalPages = Math.ceil(services.length / itemsPerPage);
+        if (totalPages <= 1) return;
+
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "← Trước";
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener("click", () => {
+            currentPage--;
+            renderServices();
+        });
+
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "Tiếp →";
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.addEventListener("click", () => {
+            currentPage++;
+            renderServices();
+        });
+
+        paginationContainer.appendChild(prevBtn);
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement("button");
+            pageBtn.textContent = i;
+            if (i === currentPage) pageBtn.classList.add("active");
+            pageBtn.addEventListener("click", () => {
+                currentPage = i;
+                renderServices();
+            });
+            paginationContainer.appendChild(pageBtn);
+        }
+        paginationContainer.appendChild(nextBtn);
+    }
+
+    function renderServices() {
+        serviceTableBody.innerHTML = "";
+
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageServices = services.slice(start, end);
+
+        pageServices.forEach((service, index) => {
+            const realIndex = start + index;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${service.name}</td>
+                <td>${service.desc}</td>
+                <td>${service.img ? `<img src="${service.img}" width="50">` : "Không có hình ảnh"}</td>
+                <td><button class="delete-btn" data-index="${realIndex}">Xóa</button></td>
+            `;
+            serviceTableBody.appendChild(row);
+        });
+
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const index = btn.getAttribute("data-index");
+                rowToDelete = btn.closest("tr");
+                rowToDelete.dataset.index = index;
+                showConfirmModal(rowToDelete);
+            });
+        });
+
+        renderPagination();
+    }
+
+    function saveServicesToStorage() {
+        localStorage.setItem("services", JSON.stringify(services));
+    }
+
+    function loadServicesFromStorage() {
+        const stored = localStorage.getItem("services");
+        if (stored) {
+            services = JSON.parse(stored);
+            renderServices();
+        }
+    }
+
     addServiceBtn.addEventListener("click", showModal);
     cancelModalBtn.addEventListener("click", closeModal);
 
@@ -83,33 +170,30 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${name}</td>
-            <td>${desc}</td>
-            <td>${img ? `<img src="${img}" width="50">` : "Không có hình ảnh"}</td>
-            <td><button class="delete-btn">Xóa</button></td>
-        `;
+        services.push({ name, desc, img });
+        saveServicesToStorage();
 
-        serviceTableBody.appendChild(newRow);
-        attachDeleteEvent(newRow.querySelector(".delete-btn"));
-
+        const totalPages = Math.ceil(services.length / itemsPerPage);
+        currentPage = totalPages;
+        renderServices();
         closeModal();
     });
-
-    function attachDeleteEvent(button) {
-        button.addEventListener("click", () => {
-            const row = button.closest("tr");
-            showConfirmModal(row);
-        });
-    }
 
     cancelDeleteBtn.addEventListener("click", closeConfirmModal);
 
     confirmDeleteBtn.addEventListener("click", () => {
         if (rowToDelete) {
-            rowToDelete.remove();
+            const index = rowToDelete.dataset.index;
+            services.splice(index, 1);
+            saveServicesToStorage();
+
+            const maxPages = Math.ceil(services.length / itemsPerPage);
+            if (currentPage > maxPages) currentPage = maxPages;
+
+            renderServices();
         }
         closeConfirmModal();
     });
+
+    loadServicesFromStorage();
 });

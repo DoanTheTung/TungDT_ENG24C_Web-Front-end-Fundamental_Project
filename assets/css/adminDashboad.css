@@ -79,6 +79,66 @@ body {
     font-weight: bold;
 }
 
+.chart-container {
+    margin-top: 30px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.bar-chart {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 300px;
+    gap: 350px;
+    margin-top: 40px;
+    border-left: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.bar {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bar-fill {
+    width: 100%;
+    background-color: #3b82f6;
+    transition: height 0.3s;
+}
+
+.bar-label {
+    margin-top: 10px;
+    color: #d0d0d0;
+}
+
+.bar-fill[data-height="0"] {
+    height: 0%;
+}
+
+.bar-fill[data-height="80"] {
+    height: 80%;
+}
+
+.bar-chart::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: linear-gradient(to top, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 100% 50px;
+    pointer-events: none;
+}
+
 .chart {
     background: white;
     border-radius: 8px;
@@ -190,6 +250,11 @@ table th {
     cursor: pointer;
 }
 
+.btn-edit{
+    border-radius: 4px;
+    border: none;
+}
+
 .btn-delete {
     background-color: red;
     color: white;
@@ -206,6 +271,58 @@ table th {
     background-color: #ccc;
 }
 
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
+}
+
+.modal-content h5 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.modal-content .btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+
+.close:hover {
+    color: #000;
+}
 
 @media (max-width: 1024px) {
     .stats {

@@ -1,3 +1,4 @@
+
 window.addEventListener("DOMContentLoaded", function () {
     const table = document.querySelector("table");
     const classFilter = document.getElementById("class");
@@ -12,9 +13,24 @@ window.addEventListener("DOMContentLoaded", function () {
     paginationContainer.className = "pagination";
     table.parentElement.appendChild(paginationContainer);
 
+    const modal = document.getElementById("editModal");
+    const classInput = document.getElementById("editClass");
+    const dateInput = document.getElementById("editDate");
+    const timeInput = document.getElementById("editTime");
+    const nameInput = document.getElementById("editName");
+    const emailInput = document.getElementById("editEmail");
+    const saveEditBtn = document.getElementById("saveEditBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    const deleteModal = document.getElementById("deleteModal");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
     let scheduleList = JSON.parse(localStorage.getItem("schedules")) || [];
     let currentPage = 1;
     const recordsPerPage = 5;
+    let editingIndex = null;
+    let scheduleToDelete = null;
 
     function populateClassFilterOptions() {
         const classNames = [...new Set(scheduleList.map(item => item.className))];
@@ -28,13 +44,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function updateStats(filteredList) {
         let gym = 0, yoga = 0, zumba = 0;
-
         filteredList.forEach(item => {
             if (item.className === "Gym") gym++;
             else if (item.className === "Yoga") yoga++;
             else if (item.className === "Zumba") zumba++;
         });
-
         gymCountSpan.textContent = gym;
         yogaCountSpan.textContent = yoga;
         zumbaCountSpan.textContent = zumba;
@@ -48,7 +62,7 @@ window.addEventListener("DOMContentLoaded", function () {
         }
         tbody.innerHTML = "";
 
-        data.forEach(item => {
+        data.forEach((item, index) => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${item.className}</td>
@@ -56,7 +70,10 @@ window.addEventListener("DOMContentLoaded", function () {
                 <td>${item.time}</td>
                 <td>${item.fullname}</td>
                 <td>${item.email}</td>
-                <td><button class="btn-delete">Xóa</button></td>
+                <td>
+                    <button class="btn-edit" data-index="${index}">Sửa</button>
+                    <button class="btn-delete" data-index="${index}">Xóa</button>
+                </td>
             `;
             tbody.appendChild(row);
         });
@@ -64,7 +81,6 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function filterData() {
         let filtered = [...scheduleList];
-
         const selectedClass = classFilter.value;
         const emailText = emailFilter.value.trim().toLowerCase();
         const selectedDate = dateFilter.value;
@@ -87,7 +103,6 @@ window.addEventListener("DOMContentLoaded", function () {
     function renderPagination(totalItems) {
         const totalPages = Math.ceil(totalItems / recordsPerPage);
         paginationContainer.innerHTML = "";
-
         if (totalPages <= 1) return;
 
         const prevBtn = document.createElement("button");
@@ -124,55 +139,69 @@ window.addEventListener("DOMContentLoaded", function () {
         const filtered = filterData();
         const startIndex = (currentPage - 1) * recordsPerPage;
         const paginated = filtered.slice(startIndex, startIndex + recordsPerPage);
-
         renderTable(paginated);
         updateStats(filtered);
         renderPagination(filtered.length);
     }
 
     table.addEventListener("click", function (e) {
-        if (e.target.classList.contains("btn-delete")) {
-            const row = e.target.closest("tr");
-            const email = row.children[4].textContent;
-            const date = row.children[1].textContent;
-            const time = row.children[2].textContent;
+        const btn = e.target;
+        const row = btn.closest("tr");
+        const index = Array.from(row.parentNode.children).indexOf(row);
+        const filtered = filterData();
+        const realIndex = scheduleList.indexOf(filtered[index]);
 
-            let scheduleToDelete = null;
-
-            table.addEventListener("click", function (e) {
-                if (e.target.classList.contains("btn-delete")) {
-                    const row = e.target.closest("tr");
-                    const email = row.children[4].textContent;
-                    const date = row.children[1].textContent;
-                    const time = row.children[2].textContent;
-
-                    scheduleToDelete = { email, date, time };
-                    document.getElementById("deleteModal").style.display = "flex";
-                }
-            });
-
-            document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
-                if (scheduleToDelete) {
-                    scheduleList = scheduleList.filter(
-                        item =>
-                            !(
-                                item.email === scheduleToDelete.email &&
-                                item.date === scheduleToDelete.date &&
-                                item.time === scheduleToDelete.time
-                            )
-                    );
-                    localStorage.setItem("schedules", JSON.stringify(scheduleList));
-                    refreshDisplay();
-                    scheduleToDelete = null;
-                }
-                document.getElementById("deleteModal").style.display = "none";
-            });
-
-            document.getElementById("cancelDeleteBtn").addEventListener("click", function () {
-                scheduleToDelete = null;
-                document.getElementById("deleteModal").style.display = "none";
-            });
+        if (btn.classList.contains("btn-delete")) {
+            scheduleToDelete = realIndex;
+            deleteModal.style.display = "flex";
         }
+
+        if (btn.classList.contains("btn-edit")) {
+            editingIndex = realIndex;
+            const schedule = scheduleList[editingIndex];
+            classInput.value = schedule.className;
+            dateInput.value = schedule.date;
+            timeInput.value = schedule.time;
+            nameInput.value = schedule.fullname;
+            emailInput.value = schedule.email;
+            modal.style.display = "flex";
+        }
+    });
+
+    confirmDeleteBtn.addEventListener("click", function () {
+        if (scheduleToDelete !== null) {
+            scheduleList.splice(scheduleToDelete, 1);
+            localStorage.setItem("schedules", JSON.stringify(scheduleList));
+            refreshDisplay();
+            scheduleToDelete = null;
+            deleteModal.style.display = "none";
+        }
+    });
+
+    cancelDeleteBtn.addEventListener("click", function () {
+        scheduleToDelete = null;
+        deleteModal.style.display = "none";
+    });
+
+    saveEditBtn.addEventListener("click", function () {
+        if (editingIndex !== null) {
+            scheduleList[editingIndex] = {
+                className: classInput.value,
+                date: dateInput.value,
+                time: timeInput.value,
+                fullname: nameInput.value,
+                email: emailInput.value
+            };
+            localStorage.setItem("schedules", JSON.stringify(scheduleList));
+            refreshDisplay();
+            modal.style.display = "none";
+            editingIndex = null;
+        }
+    });
+
+    cancelEditBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+        editingIndex = null;
     });
 
     classFilter.addEventListener("change", () => {
