@@ -1,4 +1,3 @@
-
 window.addEventListener("DOMContentLoaded", function () {
     const table = document.querySelector("table");
     const classFilter = document.getElementById("class");
@@ -16,7 +15,7 @@ window.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("editModal");
     const classInput = document.getElementById("editClass");
     const dateInput = document.getElementById("editDate");
-    const timeInput = document.getElementById("editTime");
+    const timeInput = document.getElementById("editTime"); // đây là <select>, không phải input nữa
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
     const saveEditBtn = document.getElementById("saveEditBtn");

@@ -38,67 +38,79 @@
 
             <div class="chart-container">
                 <div style="color: #d0d0d0; font-weight: bold; font-size: 13px;">
-                  <div style="width: 100px; height: 10px;border: 1px solid#3b82f6; background-color: #73a9ff; display: inline-block; margin-right: 10px;"></div>
-                  Số lượng lịch đặt
+                    <div
+                        style="width: 100px; height: 10px;border: 1px solid#3b82f6; background-color: #73a9ff; display: inline-block; margin-right: 10px;">
+                    </div>
+                    Số lượng lịch đặt
                 </div>
-        
-                <div class="bar-chart">
-                  <div class="bar">
-                    <div class="bar-fill" data-height="0"></div>
-                    <div class="bar-label">Gym</div>
-                  </div>
-                  <div class="bar">
-                    <div class="bar-fill" data-height="80"></div>
-                    <div class="bar-label">Yoga</div>
-                  </div>
-                  <div class="bar">
-                    <div class="bar-fill" data-height="0"></div>
-                    <div class="bar-label">Zumba</div>
-                  </div>
-                </div>
-              </div>
 
-                <div class="filter-section">
-                    <label for="class">Lớp học:</label>
-                    <select id="class">
-                        <option>Tất cả</option>
-                    </select>
-                    <label for="email">Email:</label>
-                    <input type="text" id="email" placeholder="Tìm theo email">
-                    <label for="date">Ngày:</label>
-                    <input type="date" id="date">
+                <div class="bar-chart">
+                    <div class="bar">
+                        <div class="bar-fill" data-height="0"></div>
+                        <div class="bar-label">Gym</div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" data-height="80"></div>
+                        <div class="bar-label">Yoga</div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" data-height="0"></div>
+                        <div class="bar-label">Zumba</div>
+                    </div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Lớp học</th>
-                            <th>Ngày tập</th>
-                            <th>Khung giờ</th>
-                            <th>Họ tên</th>
-                            <th>Email</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                </table>
+            </div>
+
+            <div class="filter-section">
+                <label for="class">Lớp học:</label>
+                <select id="class">
+                    <option>Tất cả</option>
+                </select>
+                <label for="email">Email:</label>
+                <input type="text" id="email" placeholder="Tìm theo email">
+                <label for="date">Ngày:</label>
+                <input type="date" id="date">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lớp học</th>
+                        <th>Ngày tập</th>
+                        <th>Khung giờ</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+            </table>
         </main>
     </div>
 
-    <div id="editModal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px;">
-            <h3>Sửa lịch</h3>
-            <select id="editClass">
-                <option>Gym</option>
-                <option>Yoga</option>
-                <option>Zumba</option>
-            </select><br><br>
-            <input type="date" id="editDate"><br><br>
-            <input type="time" id="editTime"><br><br>
-            <input type="text" id="editName" placeholder="Họ tên"><br><br>
-            <input type="email" id="editEmail" placeholder="Email"><br><br>
-            <button id="saveEditBtn">Lưu</button>
-            <button id="cancelEditBtn">Hủy</button>
-        </div>
+    <div id="editModal"
+    style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px;">
+        <h3>Chỉnh sửa lịch</h3>
+        <select id="editClass">
+            <option>Gym</option>
+            <option>Yoga</option>
+            <option>Zumba</option>
+        </select><br><br>
+
+        <input type="date" id="editDate"><br><br>
+
+        <select id="editTime">
+            <option value="">Chọn lại khung giờ</option>
+            <option value="6:00 - 7:00">6:00 - 7:00</option>
+            <option value="9:00 - 10:00">9:00 - 10:00</option>
+            <option value="18:00 - 19:00">18:00 - 19:00</option>
+        </select><br><br>
+
+        <input type="text" id="editName" placeholder="Họ tên"><br><br>
+        <input type="email" id="editEmail" placeholder="Email"><br><br>
+
+        <button id="saveEditBtn">Lưu</button>
+        <button id="cancelEditBtn">Hủy</button>
     </div>
+</div>
 
     <div id="deleteModal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
