@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("registerForm");
 
+    // Tạo tài khoản admin mặc định
     const adminEmail = "doanthetung126@gmail.com";
     if (!localStorage.getItem(adminEmail)) {
         const admin = {
@@ -12,10 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem(adminEmail, JSON.stringify(admin));
     }
 
+    // Nếu có form đăng ký thì lắng nghe sự kiện submit
     if (registerForm) {
         registerForm.addEventListener("submit", function (event) {
             event.preventDefault();
 
+            // Lấy dữ liệu từ form
             const fullname = document.getElementById("fullname")?.value.trim();
             const email = document.getElementById("email")?.value.trim().toLowerCase();
             const password = document.getElementById("password")?.value;
@@ -24,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (registerError) registerError.textContent = "";
 
+            // Kiểm tra dữ liệu đầu vào
             if (!fullname) {
                 registerError.textContent = "Họ và tên không được để trống";
                 return;
@@ -49,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+            // Lưu người dùng mới vào localStorage
             const newUser = {
                 fullname,
                 email,
@@ -57,6 +62,8 @@ document.addEventListener("DOMContentLoaded", function () {
             };
 
             localStorage.setItem(email, JSON.stringify(newUser));
+
+            // Chuyển hướng sang trang đăng nhập
             window.location.href = "/pages/auth/login.html";
         });
     }

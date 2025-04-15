@@ -4,33 +4,39 @@ window.addEventListener("DOMContentLoaded", function () {
     const emailFilter = document.getElementById("email");
     const dateFilter = document.getElementById("date");
 
+    // Các span hiển thị số lượng lớp
     const gymCountSpan = document.querySelector(".stat-box:nth-child(1) span");
     const yogaCountSpan = document.querySelector(".stat-box:nth-child(2) span");
     const zumbaCountSpan = document.querySelector(".stat-box:nth-child(3) span");
 
+    // Tạo vùng chứa phân trang
     const paginationContainer = document.createElement("div");
     paginationContainer.className = "pagination";
     table.parentElement.appendChild(paginationContainer);
 
+    // Modal chỉnh sửa
     const modal = document.getElementById("editModal");
     const classInput = document.getElementById("editClass");
     const dateInput = document.getElementById("editDate");
-    const timeInput = document.getElementById("editTime"); // đây là <select>, không phải input nữa
+    const timeInput = document.getElementById("editTime");
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
     const saveEditBtn = document.getElementById("saveEditBtn");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
 
+    // Modal xác nhận xóa
     const deleteModal = document.getElementById("deleteModal");
     const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
     const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 
+    // Khởi tạo dữ liệu
     let scheduleList = JSON.parse(localStorage.getItem("schedules")) || [];
     let currentPage = 1;
     const recordsPerPage = 5;
     let editingIndex = null;
     let scheduleToDelete = null;
 
+    // Lấy tất cả tên lớp không trùng để tạo tùy chọn lọc
     function populateClassFilterOptions() {
         const classNames = [...new Set(scheduleList.map(item => item.className))];
         classNames.forEach(cls => {
@@ -41,6 +47,7 @@ window.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Cập nhật thống kê số lượng lớp (Gym, Yoga, Zumba)
     function updateStats(filteredList) {
         let gym = 0, yoga = 0, zumba = 0;
         filteredList.forEach(item => {
@@ -53,6 +60,7 @@ window.addEventListener("DOMContentLoaded", function () {
         zumbaCountSpan.textContent = zumba;
     }
 
+    // Vẽ bảng dữ liệu từ mảng đã lọc & phân trang
     function renderTable(data) {
         let tbody = table.querySelector("tbody");
         if (!tbody) {
@@ -78,6 +86,7 @@ window.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Hàm lọc dữ liệu theo class, email và ngày
     function filterData() {
         let filtered = [...scheduleList];
         const selectedClass = classFilter.value;
@@ -99,11 +108,13 @@ window.addEventListener("DOMContentLoaded", function () {
         return filtered;
     }
 
+    // Vẽ phân trang tùy vào số lượng bản ghi
     function renderPagination(totalItems) {
         const totalPages = Math.ceil(totalItems / recordsPerPage);
         paginationContainer.innerHTML = "";
         if (totalPages <= 1) return;
 
+        // Nút trước
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "«";
         prevBtn.disabled = currentPage === 1;
@@ -113,6 +124,7 @@ window.addEventListener("DOMContentLoaded", function () {
         };
         paginationContainer.appendChild(prevBtn);
 
+        // Nút số trang
         for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement("button");
             pageBtn.textContent = i;
@@ -124,6 +136,7 @@ window.addEventListener("DOMContentLoaded", function () {
             paginationContainer.appendChild(pageBtn);
         }
 
+        // Nút tiếp
         const nextBtn = document.createElement("button");
         nextBtn.textContent = "»";
         nextBtn.disabled = currentPage === totalPages;
@@ -134,8 +147,9 @@ window.addEventListener("DOMContentLoaded", function () {
         paginationContainer.appendChild(nextBtn);
     }
 
+    // Cập nhật bảng, phân trang và thống kê
     function refreshDisplay() {
-        const filtered = filterData();
+        const filtered = filterData(); // Dữ liệu đã lọc
         const startIndex = (currentPage - 1) * recordsPerPage;
         const paginated = filtered.slice(startIndex, startIndex + recordsPerPage);
         renderTable(paginated);
@@ -143,6 +157,7 @@ window.addEventListener("DOMContentLoaded", function () {
         renderPagination(filtered.length);
     }
 
+    // Bắt sự kiện khi nhấn nút "Sửa" hoặc "Xóa"
     table.addEventListener("click", function (e) {
         const btn = e.target;
         const row = btn.closest("tr");
@@ -150,11 +165,13 @@ window.addEventListener("DOMContentLoaded", function () {
         const filtered = filterData();
         const realIndex = scheduleList.indexOf(filtered[index]);
 
+        // Nếu là nút xóa, mở modal xác nhận
         if (btn.classList.contains("btn-delete")) {
             scheduleToDelete = realIndex;
             deleteModal.style.display = "flex";
         }
 
+        // Nếu là nút sửa, mở modal chỉnh sửa với dữ liệu sẵn
         if (btn.classList.contains("btn-edit")) {
             editingIndex = realIndex;
             const schedule = scheduleList[editingIndex];
@@ -167,6 +184,7 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Xác nhận xóa: xóa lịch khỏi danh sách và cập nhật localStorage
     confirmDeleteBtn.addEventListener("click", function () {
         if (scheduleToDelete !== null) {
             scheduleList.splice(scheduleToDelete, 1);
@@ -177,11 +195,13 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Hủy xóa
     cancelDeleteBtn.addEventListener("click", function () {
         scheduleToDelete = null;
         deleteModal.style.display = "none";
     });
 
+    // Lưu chỉnh sửa
     saveEditBtn.addEventListener("click", function () {
         if (editingIndex !== null) {
             scheduleList[editingIndex] = {
@@ -198,11 +218,13 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Hủy chỉnh sửa
     cancelEditBtn.addEventListener("click", function () {
         modal.style.display = "none";
         editingIndex = null;
     });
 
+    // Bộ lọc: cập nhật lại danh sách khi người dùng thay đổi bộ lọc
     classFilter.addEventListener("change", () => {
         currentPage = 1;
         refreshDisplay();
@@ -216,6 +238,7 @@ window.addEventListener("DOMContentLoaded", function () {
         refreshDisplay();
     });
 
+    // Khởi động: điền option vào bộ lọc class và hiển thị bảng ban đầu
     populateClassFilterOptions();
     refreshDisplay();
 });

@@ -1,17 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Lấy các phần tử cần dùng
     const addServiceBtn = document.querySelector(".add-service");
     const serviceTable = document.querySelector(".service-table table");
     const serviceTableBody = document.createElement("tbody");
     serviceTable.appendChild(serviceTableBody);
 
+    // Tạo vùng phân trang
     const paginationContainer = document.createElement("div");
     paginationContainer.className = "pagination";
     serviceTable.parentElement.appendChild(paginationContainer);
 
+    // Biến lưu trữ dữ liệu dịch vụ
     let services = [];
     let currentPage = 1;
     const itemsPerPage = 5;
 
+    // Tạo modal thêm dịch vụ
     const modalOverlay = document.createElement("div");
     modalOverlay.className = "modal-overlay";
     modalOverlay.innerHTML = `
@@ -30,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(modalOverlay);
     modalOverlay.style.display = "none";
 
+    // Lấy các input và nút trong modal
     const serviceNameInput = modalOverlay.querySelector("#serviceName");
     const serviceDescInput = modalOverlay.querySelector("#serviceDesc");
     const imageUrlInput = modalOverlay.querySelector("#imageUrl");
@@ -37,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveModalBtn = modalOverlay.querySelector("#saveModal");
     const cancelModalBtn = modalOverlay.querySelector("#cancelModal");
 
+    // Tạo modal xác nhận xoá
     const confirmOverlay = document.createElement("div");
     confirmOverlay.className = "modal-overlay";
     confirmOverlay.innerHTML = `
@@ -55,7 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmDeleteBtn = confirmOverlay.querySelector("#confirmDelete");
 
     let rowToDelete = null;
-
+    
+    // Hiện modal thêm dịch vụ
     function showModal() {
         serviceNameInput.value = "";
         serviceDescInput.value = "";
@@ -64,26 +71,31 @@ document.addEventListener("DOMContentLoaded", () => {
         modalOverlay.style.display = "flex";
     }
 
+    // Đóng modal thêm
     function closeModal() {
         modalOverlay.style.display = "none";
     }
 
+    // Hiện modal xác nhận xoá
     function showConfirmModal(row) {
         rowToDelete = row;
         confirmOverlay.style.display = "flex";
     }
 
+    // Đóng modal xác nhận
     function closeConfirmModal() {
         confirmOverlay.style.display = "none";
         rowToDelete = null;
     }
 
+    // Vẽ các nút phân trang
     function renderPagination() {
         paginationContainer.innerHTML = "";
 
         const totalPages = Math.ceil(services.length / itemsPerPage);
         if (totalPages <= 1) return;
 
+        // Nút trang trước
         const prevBtn = document.createElement("button");
         prevBtn.textContent = "← Trước";
         prevBtn.disabled = currentPage === 1;
@@ -92,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderServices();
         });
 
+        // Nút trang kế
         const nextBtn = document.createElement("button");
         nextBtn.textContent = "Tiếp →";
         nextBtn.disabled = currentPage === totalPages;
@@ -101,6 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         paginationContainer.appendChild(prevBtn);
+
+        // Nút số trang
         for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement("button");
             pageBtn.textContent = i;
@@ -111,9 +126,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             paginationContainer.appendChild(pageBtn);
         }
+
         paginationContainer.appendChild(nextBtn);
     }
 
+    // Hiển thị danh sách dịch vụ trong bảng
     function renderServices() {
         serviceTableBody.innerHTML = "";
 
@@ -121,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const end = start + itemsPerPage;
         const pageServices = services.slice(start, end);
 
+        // Vẽ từng dòng
         pageServices.forEach((service, index) => {
             const realIndex = start + index;
             const row = document.createElement("tr");
@@ -133,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
             serviceTableBody.appendChild(row);
         });
 
+        // Gán sự kiện xoá
         document.querySelectorAll(".delete-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 const index = btn.getAttribute("data-index");
@@ -145,10 +164,12 @@ document.addEventListener("DOMContentLoaded", () => {
         renderPagination();
     }
 
+    // Lưu dữ liệu vào localStorage
     function saveServicesToStorage() {
         localStorage.setItem("services", JSON.stringify(services));
     }
 
+    // Tải dữ liệu từ localStorage
     function loadServicesFromStorage() {
         const stored = localStorage.getItem("services");
         if (stored) {
@@ -157,30 +178,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Xử lý khi nhấn Thêm dịch vụ
     addServiceBtn.addEventListener("click", showModal);
+
+    // Huỷ trong modal thêm
     cancelModalBtn.addEventListener("click", closeModal);
 
+    // Lưu dịch vụ mới
     saveModalBtn.addEventListener("click", () => {
         const name = serviceNameInput.value.trim();
         const desc = serviceDescInput.value.trim();
         const img = imageUrlInput.value.trim();
 
+        // Kiểm tra dữ liệu
         if (!name || !desc) {
             modalError.textContent = "Vui lòng nhập đầy đủ tên và mô tả dịch vụ!";
             return;
         }
 
+        // Thêm và cập nhật
         services.push({ name, desc, img });
         saveServicesToStorage();
-
-        const totalPages = Math.ceil(services.length / itemsPerPage);
-        currentPage = totalPages;
+        currentPage = Math.ceil(services.length / itemsPerPage);
         renderServices();
         closeModal();
     });
 
+    // Huỷ xoá
     cancelDeleteBtn.addEventListener("click", closeConfirmModal);
 
+    // Xác nhận xoá dịch vụ
     confirmDeleteBtn.addEventListener("click", () => {
         if (rowToDelete) {
             const index = rowToDelete.dataset.index;
@@ -195,5 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
         closeConfirmModal();
     });
 
+    // Tải dịch vụ khi trang load
     loadServicesFromStorage();
 });
